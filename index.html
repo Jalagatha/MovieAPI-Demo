@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,39 +6,130 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Movie Explorer</title>
   <style>
-    body { font-family: Arial; background: #121212; color: white; padding: 20px; }
-    .movie { margin-bottom: 15px; }
-    img { height: 200px; border-radius: 8px; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
+    }
+    .login, .movies {
+      display: none;
+      padding: 2rem;
+    }
+    .login.active, .movies.active {
+      display: block;
+    }
+    .login input {
+      padding: 10px;
+      margin: 5px;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 5px;
+      border: none;
+    }
+    .login button {
+      padding: 10px 20px;
+      background: #4CAF50;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .movie-card {
+      background: #1e1e1e;
+      padding: 1rem;
+      border-radius: 10px;
+    }
+    .movie-card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    iframe {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <h1>Popular Movies</h1>
-  <div id="movies"></div>
+
+  <!-- Login Page -->
+  <div class="login active" id="loginPage">
+    <h2>Login to Movie Explorer</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- Movies Page -->
+  <div class="movies" id="moviePage">
+    <h1>Now Playing</h1>
+    <div class="movie-grid" id="moviesContainer"></div>
+  </div>
 
   <script>
     const API_KEY = '5f4a5627e124ee441f916bf7555aeb7d';
     const BASE_URL = 'https://api.themoviedb.org/3';
     const IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
-    const API_ACCESS_TOKEN='eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ZjRhNTYyN2UxMjRlZTQ0MWY5MTZiZjc1NTVhZWI3ZCIsIm5iZiI6MTcxMTU0MDU3NS40MDQsInN1YiI6IjY2MDQwOTVmYjAyZjVlMDE3ZDIyNGExYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.5hKxQjRGEJO0oLDXDVahkPwmaQrB-aiGVsNvD_pl3p0';
+    const API_ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ZjRhNTYyN2UxMjRlZTQ0MWY5MTZiZjc1NTVhZWI3ZCIsIm5iZiI6MTcxMTU0MDU3NS40MDQsInN1YiI6IjY2MDQwOTVmYjAyZjVlMDE3ZDIyNGExYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.5hKxQjRGEJO0oLDXDVahkPwmaQrB-aiGVsNvD_pl3p0';
 
-    async function fetchMovies() {
-      const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
-      const data = await res.json();
-      const moviesContainer = document.getElementById('movies');
-
-      data.results.forEach(movie => {
-        const div = document.createElement('div');
-        div.className = 'movie';
-        div.innerHTML = `
-          <h2>${movie.title}</h2>
-          <img src="${IMAGE_BASE + movie.poster_path}" alt="${movie.title}" />
-          <p>${movie.overview}</p>
-        `;
-        moviesContainer.appendChild(div);
-      });
+    // Simple login logic
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      if (username && password) {
+        document.getElementById('loginPage').classList.remove('active');
+        document.getElementById('moviePage').classList.add('active');
+        fetchMovies();
+      } else {
+        alert("Enter username and password.");
+      }
     }
 
-    fetchMovies();
+    async function fetchMovies() {
+      const res = await fetch(`${BASE_URL}/movie/now_playing`, {
+        headers: {
+          Authorization: `Bearer ${API_ACCESS_TOKEN}`,
+          accept: 'application/json',
+        },
+      });
+      const data = await res.json();
+      displayMovies(data.results);
+    }
+
+    async function fetchTrailer(movieId) {
+      const res = await fetch(`${BASE_URL}/movie/${movieId}/videos`, {
+        headers: {
+          Authorization: `Bearer ${API_ACCESS_TOKEN}`,
+          accept: 'application/json',
+        },
+      });
+      const data = await res.json();
+      const trailer = data.results.find(v => v.type === "Trailer" && v.site === "YouTube");
+      return trailer ? `https://www.youtube.com/embed/${trailer.key}` : null;
+    }
+
+    async function displayMovies(movies) {
+      const container = document.getElementById('moviesContainer');
+      container.innerHTML = '';
+      for (let movie of movies) {
+        const trailerUrl = await fetchTrailer(movie.id);
+        const movieEl = document.createElement('div');
+        movieEl.className = 'movie-card';
+        movieEl.innerHTML = `
+          <h2>${movie.title}</h2>
+          <img src="${IMAGE_BASE + movie.poster_path}" alt="${movie.title}">
+          ${trailerUrl ? `<iframe height="200" src="${trailerUrl}" frameborder="0" allowfullscreen></iframe>` : '<p>No trailer available</p>'}
+        `;
+        container.appendChild(movieEl);
+      }
+    }
   </script>
 </body>
 </html>
