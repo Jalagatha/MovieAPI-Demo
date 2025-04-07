@@ -1,12 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieAPI</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
 <body>
 
     <!-- Register Page -->
     <div class="login-page" id="registerPage">
       <div class="login-box">
         <h2>Create Account</h2>
-        <input type="text" id="regUsername" placeholder="Username" />
-        <input type="email" id="regEmail" placeholder="Email" />
-        <input type="password" id="regPassword" placeholder="Password" />
+        <div><input type="text" id="regUsername" placeholder="Username" /></div>
+        <div><input type="email" id="regEmail" placeholder="Email" /></div>
+       <div> <input type="password" id="regPassword" placeholder="Password" /></div>
         <button onclick="register()">Register</button>
         <p style="margin-top:10px;">Already have an account? <span style="color:#4CAF50;cursor:pointer;" onclick="showLogin()">Login here</span></p>
       </div>
@@ -16,8 +24,9 @@
     <div class="login-page" id="loginPage" style="display:none;">
       <div class="login-box">
         <h2>Login to Movie Explorer</h2>
-        <input type="text" id="username" placeholder="Username" />
-        <input type="password" id="password" placeholder="Password" />
+        <div><input type="text" id="username" placeholder="Username" /></div>
+        
+       <div> <input type="password" id="password" placeholder="Password" /></div>
         <button onclick="login()">Login</button>
         <p style="margin-top:10px;">New user? <span style="color:#4CAF50;cursor:pointer;" onclick="showRegister()">Register here</span></p>
       </div>
@@ -84,6 +93,7 @@
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const stored = JSON.parse(localStorage.getItem('user'));
+
   
         if (!stored || stored.username !== username || stored.password !== password) {
           alert("Invalid username or password.");
@@ -148,3 +158,4 @@
     </script>
   </body>
   
+</html>
