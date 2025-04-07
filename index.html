@@ -15,9 +15,10 @@
   <div id="movies"></div>
 
   <script>
-    const API_KEY = 'YOUR_TMDB_API_KEY';
+    const API_KEY = '5f4a5627e124ee441f916bf7555aeb7d';
     const BASE_URL = 'https://api.themoviedb.org/3';
     const IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
+    const API_ACCESS_TOKEN='eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ZjRhNTYyN2UxMjRlZTQ0MWY5MTZiZjc1NTVhZWI3ZCIsIm5iZiI6MTcxMTU0MDU3NS40MDQsInN1YiI6IjY2MDQwOTVmYjAyZjVlMDE3ZDIyNGExYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.5hKxQjRGEJO0oLDXDVahkPwmaQrB-aiGVsNvD_pl3p0';
 
     async function fetchMovies() {
       const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
